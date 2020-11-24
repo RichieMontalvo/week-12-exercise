@@ -1,23 +1,24 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
-import { SafeAreaView, FlatList, StyleSheet, TouchableOpacity, Text, View, Button, Image } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 const ItemList = ({ route, navigation }) => {
 
   const { items } = route.params
 
   useEffect( () => {
-    console.log(items)
+    //console.log(items)
   })
 
   const goToDetails = (item) => {
     navigation.navigate('Item Details', {name: item.name, image: item.image});
   }
 
-  const itemRow = ({ item }) => (
+  const itemCell = ( item, index ) => (
     <TouchableOpacity 
       style={styles.cell}
       onPress={() => goToDetails(item)}
+      id={index}
     >
       <Image style={styles.image} source={item.image} />
     </TouchableOpacity>
@@ -25,12 +26,17 @@ const ItemList = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.grid}>
-      <FlatList 
-      contentContainerStyle={styles.grid}
+      <ScrollView 
+        contentContainerStyle={styles.grid}
         data={items}
-        renderItem={itemRow}
-        keyExtractor={item => item.id}
-      />
+      >
+        {
+          items.map( (item, index) => 
+            itemCell(item, index)
+          )
+        }
+      </ScrollView>
+
       <StatusBar style="auto" />
     </SafeAreaView>
   );
@@ -44,6 +50,7 @@ const styles = StyleSheet.create({
   },
   grid: {
     flex: 1,
+    marginTop: 3,
     backgroundColor: '#fff',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
