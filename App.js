@@ -5,6 +5,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { Alert, StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-elements';
 
+import * as ImagePicker from 'expo-image-picker';
+import * as Permissions from 'expo-permissions';
+import * as MediaLibrary from 'expo-media-library';
+
 import ItemList from './components/ItemList';
 import ItemDetails from './components/ItemDetails';
 
@@ -12,14 +16,39 @@ const Stack = createStackNavigator();
 
 const App = () => {
 
+  const [cameraPermission, askForCameraPermission] = Permissions.usePermissions(Permissions.CAMERA, {ask: true});
+  const [cameraRollPermission, askForCameraRollPermission] = Permissions.usePermissions(Permissions.CAMERA_ROLL, {ask: true});
+
   const [items, setItems] = useState([]);
 
-  const pickPhoto = () => {
-    Alert.alert("Pick Photo", "Time to access the library.");
+  const pickPhoto = async () => {
+    if (cameraRollPermission.status == 'granted') {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+        base64: true
+      });
+    }
+    else {
+      askForCameraRollPermission();
+    }
   }
 
-  const takePhoto = () => {
-    Alert.alert("Take Photo", "Time to take the photo.");
+  const takePhoto = async () => {
+    if (cameraPermission.status == 'granted') {
+      let result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+        base64: true
+      });
+    }
+    else {
+      askForCameraPermission();
+    }
   }
 
   return (
