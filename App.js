@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -8,6 +8,8 @@ import { Button } from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import * as MediaLibrary from 'expo-media-library';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import ItemList from './components/ItemList';
 import ItemDetails from './components/ItemDetails';
@@ -21,6 +23,21 @@ const App = () => {
 
   const [items, setItems] = useState([]);
 
+  useEffect ( () => {
+    if (items.lenght != 0)
+    storeData(items);
+  });
+
+  const storeData = async (items) => {
+    try {
+      const json = JSON.stringify(items);
+      await AsyncStorage.setItem('@items', json);
+    }
+    catch (e) {
+      console.log(e)
+    }
+  }
+
   const pickPhoto = async () => {
     if (cameraRollPermission.status == 'granted') {
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -30,6 +47,12 @@ const App = () => {
         quality: 1,
         base64: true
       });
+      if (result.base64) {
+        const item = {
+          image: result.base64,
+        }
+        setItems([...items, item]);
+      }
     }
     else {
       askForCameraRollPermission();
@@ -43,8 +66,19 @@ const App = () => {
         allowsEditing: true,
         aspect: [1, 1],
         quality: 1,
-        base64: true
+        base64: true,
       });
+
+      if (result.uri) {
+        if (cameraRollPermission.status == 'granted') {
+          MediaLibrary.saveToLibraryAsync(result.uri);
+          const item = {
+            image: result.base64,
+          }
+          setItems([...items, item]);
+        }
+      }
+
     }
     else {
       askForCameraPermission();
@@ -57,7 +91,6 @@ const App = () => {
         <Stack.Screen 
           name="Item List" 
           component={ItemList} 
-          initialParams={{ items: items }}
           options={{
             headerRight: () => (
               <View style={styles.buttons}>

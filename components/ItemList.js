@@ -1,14 +1,29 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ItemList = ({ route, navigation }) => {
 
-  const { items } = route.params
+  const [items, setItems] = useState([]);
 
   useEffect( () => {
-    //console.log(items)
+    //console.log(items);
+    getData();
   })
+
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@items');
+      if (jsonValue != null) {
+        setItems(JSON.parse(jsonValue))
+      }
+    }
+    catch(e) {
+      console.log(e);
+    }
+  }
 
   const goToDetails = (item) => {
     navigation.navigate('Item Details', {name: item.name, image: item.image});
@@ -18,9 +33,9 @@ const ItemList = ({ route, navigation }) => {
     <TouchableOpacity 
       style={styles.cell}
       onPress={() => goToDetails(item)}
-      id={index}
+      key={index}
     >
-      <Image style={styles.image} source={item.image} />
+      <Image style={styles.image} source={{ uri: 'data:image/jpeg;base64,' + item.image }} />
     </TouchableOpacity>
   )
 
@@ -51,9 +66,10 @@ const styles = StyleSheet.create({
   grid: {
     flex: 1,
     marginTop: 3,
+    marginLeft: 3,
     backgroundColor: '#fff',
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    justifyContent: 'flex-start',
     flexWrap: 'wrap',
   },
   title: {
