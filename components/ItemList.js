@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   cell: {
-    width: 120,
-    height: 120,
+    width: 115,
+    height: 115,
   },
   row: {
     flex: 1,
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   image: {
-    width: 115,
-    height: 115,
+    width: 110,
+    height: 110,
   }
 });
