@@ -24,7 +24,7 @@ const App = () => {
   const [items, setItems] = useState([]);
 
   useEffect ( () => {
-    if (items.lenght != 0)
+    if (items.length != 0)
     storeData(items);
   });
 
